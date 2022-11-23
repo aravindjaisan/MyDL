@@ -4122,17 +4122,4 @@ print(len(labels_test))
 1953
 sub = pd.DataFrame({'id': np.array(id_test), 'label': np.array(labels_test)})
 sub.to_csv('output.csv', index=False)
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
+
