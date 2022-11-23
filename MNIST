@@ -1,0 +1,154 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation
+from keras.utils import np_utils
+
+np.random.seed(35)
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+print("X_train original shape", X_train.shape)
+print("y_train original shape", y_train.shape)
+print("X_test original shape", X_test.shape)
+print("y_test original shape", y_test.shape)
+Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz
+11493376/11490434 [==============================] - 0s 0us/step
+X_train original shape (60000, 28, 28)
+y_train original shape (60000,)
+X_test original shape (10000, 28, 28)
+y_test original shape (10000,)
+plt.imshow(X_test[1050], cmap='gray')
+plt.title(y_test[1050])
+Text(0.5, 1.0, '2')
+
+X_train = X_train.reshape(60000,784)
+X_test = X_test.reshape(10000,784)
+
+X_train = X_train.astype('float32')
+X_test = X_test.astype('float32')
+
+X_train/=255
+X_test/=255 
+number_of_classes = 10
+
+Y_train = np_utils.to_categorical(y_train, number_of_classes)
+Y_test = np_utils.to_categorical(y_test, number_of_classes)
+
+y_train[10], Y_train[10]
+(3, array([0., 0., 0., 1., 0., 0., 0., 0., 0., 0.], dtype=float32))
+model = Sequential()
+
+model.add(Dense(512, input_dim=784,activation='relu'))
+# An "activation" is just a non-linear function applied to the output
+# of the layer above. Here, with a "rectified linear unit",
+# we clamp all values below 0 to 0.
+#model.add(Activation('relu'))
+# Dropout helps protect the model from memorizing or "overfitting" the training data
+#model.add(Dropout(0.2))
+
+model.add(Dense(256,activation='relu'))
+#model.add(Activation('relu'))
+#model.add(Dropout(0.2))
+
+model.add(Dense(128,activation='relu'))
+#model.add(Activation('relu'))
+#model.add(Dropout(0.2))
+
+model.add(Dense(10,activation='softmax'))
+# This special "softmax" activation among other things,
+# ensures the output is a valid probaility distribution, that is
+# that its values are all non-negative and sum to 1.
+#model.add(Activation('softmax'))
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.summary()
+Model: "sequential_3"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+dense_10 (Dense)             (None, 512)               401920    
+_________________________________________________________________
+dense_11 (Dense)             (None, 256)               131328    
+_________________________________________________________________
+dense_12 (Dense)             (None, 128)               32896     
+_________________________________________________________________
+dense_13 (Dense)             (None, 10)                1290      
+=================================================================
+Total params: 567,434
+Trainable params: 567,434
+Non-trainable params: 0
+_________________________________________________________________
+size = int(len(X_train) * 0.8)
+
+train_x, val_x = X_train[:size], X_train[size:]
+train_y, val_y = Y_train[:size], Y_train[size:]
+hist = model.fit(train_x, train_y, batch_size=128, epochs=20, validation_data=(val_x, val_y))
+Epoch 1/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0908 - accuracy: 0.9732 - val_loss: 0.1151 - val_accuracy: 0.9673
+Epoch 2/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0805 - accuracy: 0.9761 - val_loss: 0.1029 - val_accuracy: 0.9707
+Epoch 3/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0747 - accuracy: 0.9773 - val_loss: 0.1060 - val_accuracy: 0.9707
+Epoch 4/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0650 - accuracy: 0.9804 - val_loss: 0.1025 - val_accuracy: 0.9700
+Epoch 5/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0591 - accuracy: 0.9823 - val_loss: 0.0941 - val_accuracy: 0.9738
+Epoch 6/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0521 - accuracy: 0.9844 - val_loss: 0.0882 - val_accuracy: 0.9747
+Epoch 7/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0472 - accuracy: 0.9854 - val_loss: 0.0961 - val_accuracy: 0.9718
+Epoch 8/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0415 - accuracy: 0.9873 - val_loss: 0.0908 - val_accuracy: 0.9745
+Epoch 9/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0370 - accuracy: 0.9888 - val_loss: 0.0950 - val_accuracy: 0.9735
+Epoch 10/20
+375/375 [==============================] - 2s 6ms/step - loss: 0.0352 - accuracy: 0.9885 - val_loss: 0.0958 - val_accuracy: 0.9747
+Epoch 11/20
+375/375 [==============================] - 2s 6ms/step - loss: 0.0299 - accuracy: 0.9908 - val_loss: 0.0930 - val_accuracy: 0.9758
+Epoch 12/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0281 - accuracy: 0.9908 - val_loss: 0.0934 - val_accuracy: 0.9746
+Epoch 13/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0249 - accuracy: 0.9923 - val_loss: 0.0932 - val_accuracy: 0.9753
+Epoch 14/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0227 - accuracy: 0.9930 - val_loss: 0.0930 - val_accuracy: 0.9767
+Epoch 15/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0195 - accuracy: 0.9938 - val_loss: 0.0965 - val_accuracy: 0.9767
+Epoch 16/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0180 - accuracy: 0.9942 - val_loss: 0.1068 - val_accuracy: 0.9749
+Epoch 17/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0182 - accuracy: 0.9945 - val_loss: 0.1098 - val_accuracy: 0.9728
+Epoch 18/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0148 - accuracy: 0.9951 - val_loss: 0.1054 - val_accuracy: 0.9758
+Epoch 19/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0120 - accuracy: 0.9965 - val_loss: 0.0951 - val_accuracy: 0.9783
+Epoch 20/20
+375/375 [==============================] - 2s 5ms/step - loss: 0.0107 - accuracy: 0.9967 - val_loss: 0.1037 - val_accuracy: 0.9765
+score = model.evaluate(X_test, Y_test)
+print()
+print('Test accuracy: ', score[1])
+313/313 [==============================] - 1s 3ms/step - loss: 0.0959 - accuracy: 0.9766
+
+Test accuracy:  0.9765999913215637
+predictions = model.predict_classes(X_test)
+
+predictions = list(predictions)
+actuals = list(y_test)
+
+sub = pd.DataFrame({'Actual': actuals, 'Predictions': predictions})
+sub.to_csv('output.csv', index=False)
+ 
+plt.figure(figsize=(14,3))
+plt.subplot(1, 2, 1)
+plt.suptitle('Optimizer : Adam', fontsize=10)
+plt.ylabel('Loss', fontsize=16)
+plt.plot(hist.history['loss'], color='b', label='Training Loss')
+plt.plot(hist.history['val_loss'], color='r', label='Validation Loss')
+plt.legend(loc='upper right')
+
+plt.subplot(1, 2, 2)
+plt.ylabel('Accuracy', fontsize=16)
+plt.plot(hist.history['accuracy'], color='b', label='Training Accuracy')
+plt.plot(hist.history['val_accuracy'], color='r', label='Validation Accuracy')
+plt.legend(loc='lower right')
+plt.show()
